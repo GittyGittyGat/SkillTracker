@@ -1,6 +1,8 @@
 import mysql from 'mysql2'
-import * as secret from './details.mjs';
+import * as dbDetails from './details.mjs';
 import winston from 'winston'
+import * as secret from './logincreds.mjs';
+
 
 const logger = winston.createLogger({
   level: 'info',
@@ -149,31 +151,31 @@ async function setupDataBase(){
   await connectDatabase();
   await checkDatabaseAndCreate(databaseConnection, secret.SQL_DB_NAME);
   await useDatabase(databaseConnection, secret.SQL_DB_NAME);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, secret.DB_USERS_TABLE, secret.USERS_TABLE_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, secret.DB_TABLE_ONE, secret.TABLE_ONE_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, secret.DB_TABLE_TWO, secret.TABLE_TWO_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, secret.DB_TABLE_THREE, secret.TABLE_THREE_SCHEMA);
+  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_USERS_TABLE, dbDetails.USERS_TABLE_SCHEMA);
+  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_ONE, dbDetails.TABLE_ONE_SCHEMA);
+  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_TWO, dbDetails.TABLE_TWO_SCHEMA);
+  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_THREE, dbDetails.TABLE_THREE_SCHEMA);
 
   // INSERT TESTS:
   // passed this test, successfully added 'testUsr' and 'testPass' into the database.
   // successfully failed to re-add the testUsr as it's supposed to be unique.
   
-  //console.log(await insertDataIntoDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ["testUsr", "testPass"]));
-  //await insertDataIntoDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ["testUsr", "testPass", "hello"]);
+  //console.log(await insertDataIntoDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ["testUsr", "testPass"]));
+  //await insertDataIntoDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ["testUsr", "testPass", "hello"]);
   
   
   // SELECT TESTS:
   // successfully read data when * was used, when columns were specified, when arrays were given,
   // and failed appropriately when expected (wrong fields etc...)
   
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, '*', 'username', 'testUsr'));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, 'username', 'testUsr'));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ['username'], ['testUsr']));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'testPass']));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ['username'], ['non-existing-user']));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_TABLE_ONE, secret.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
-  // console.log(await readFromDatabase(databaseConnection, secret.DB_USERS_TABLE, secret.TABLE_ONE_INSERT_COLUMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, '*', 'username', 'testUsr'));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, 'username', 'testUsr'));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ['username'], ['testUsr']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'testPass']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ['username'], ['non-existing-user']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_TABLE_ONE, dbDetails.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
+  // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.TABLE_ONE_INSERT_COLUMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
 }
 
 

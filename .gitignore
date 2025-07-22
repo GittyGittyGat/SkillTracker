@@ -3,3 +3,4 @@ nodeJS/server.mjs
 nodeJS/logincreds.mjs
 nodeJS/details.mjs
 Documents/What is SkillTracker.docx
+client/*

@@ -3,4 +3,16 @@ nodeJS/server.mjs
 nodeJS/logincreds.mjs
 nodeJS/details.mjs
 Documents/What is SkillTracker.docx
+dep-components
+client-react-dep
+client/README.md
+client/package.json
+client/package-lock.json
+client/public
+client/.gitignore
+client/eslint.config.mjs
+client/next.config.mjs
+client/jsconfig.json
+client/src/app/favicon.ico
+client/src/app/globals.css
 client/*

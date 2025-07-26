@@ -17,7 +17,7 @@ const logger = winston.createLogger({
   ]
 });
 
-let databaseConnection = mysql.createConnection({
+const con = mysql.createConnection({
   host: secret.SQL_HOST,
   user: secret.SQL_USER,
   password: secret.SQL_PASSWORD
@@ -25,7 +25,7 @@ let databaseConnection = mysql.createConnection({
 
 function connectDatabase(){
   return new Promise((resolve, reject) => {
-    databaseConnection.connect(function(err){
+    con.connect(function(err){
     if (err) return reject(err);
     logger.info("Connected!");
     resolve();
@@ -33,7 +33,7 @@ function connectDatabase(){
   })
 }
 
-function checkDatabaseAndCreate(con, databaseName){
+function checkDatabaseAndCreate(databaseName){
   return new Promise((resolve, reject) => {
       con.query(`SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?`, [databaseName], (err, result) => {
       if (err){
@@ -55,7 +55,7 @@ function checkDatabaseAndCreate(con, databaseName){
   })
 }
 
-function useDatabase(con, databaseName) {
+function useDatabase(databaseName) {
   const useQuery = `USE ${mysql.escapeId(databaseName)}`;
   return new Promise((resolve, reject) =>{
   con.query(useQuery, (err) => {
@@ -70,7 +70,7 @@ function useDatabase(con, databaseName) {
 }
 
 
-export function checkTableAndCreate(con, databaseName, tableName, tableDetails){
+function checkTableAndCreate(databaseName, tableName, tableDetails){
   return new Promise((resolve, reject) =>{
     con.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?", [databaseName, tableName], (err, result) =>{
       if (err){
@@ -95,13 +95,13 @@ export function checkTableAndCreate(con, databaseName, tableName, tableDetails){
   });
 }
 
-export function insertDataIntoDatabase(con, tableName, dataSet, userData){
+export function insertDataIntoDatabase(tableName, dataSet, userData){
   if(dataSet.length !== userData.length)
     return Promise.reject(new Error("Columns count doesn't match values count"));
   
   const placeHolders = userData.map(()=>'?').join(', ');
   const columnNames = dataSet.map(col => mysql.escapeId(col)).join(', ');
-  const statement = `INSERT INTO ${mysql.escapeId(tableName)} (${columnNames}) VALUES(${placeHolders})`;
+  const statement = `INSERT INTO ${mysql.escapeId(tableName)} (${columnNames} ${tableName === dbDetails.DB_USERS_TABLE ? ", userUUID" : ''}) VALUES(${placeHolders} ${tableName === dbDetails.DB_USERS_TABLE ? ", uuid()" : ''})`;
 
   return new Promise((resolve, reject) => {
     con.query(statement, userData, (err, result) =>{
@@ -120,7 +120,7 @@ export function insertDataIntoDatabase(con, tableName, dataSet, userData){
   });
 }
 
-export function readFromDatabase(con, tableName, dataSet, constraintParameter, constraintValue){
+export function readFromDatabase(tableName, dataSet, constraintParameter, constraintValue){
   let parameters = '';
   let values = [];
   if(Array.isArray(constraintParameter)){
@@ -147,14 +147,14 @@ export function readFromDatabase(con, tableName, dataSet, constraintParameter, c
   });
 }
 
-async function setupDataBase(){
+export async function setupDataBase(){
   await connectDatabase();
-  await checkDatabaseAndCreate(databaseConnection, secret.SQL_DB_NAME);
-  await useDatabase(databaseConnection, secret.SQL_DB_NAME);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_USERS_TABLE, dbDetails.USERS_TABLE_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_ONE, dbDetails.TABLE_ONE_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_TWO, dbDetails.TABLE_TWO_SCHEMA);
-  await checkTableAndCreate(databaseConnection, secret.SQL_DB_NAME, dbDetails.DB_TABLE_THREE, dbDetails.TABLE_THREE_SCHEMA);
+  await checkDatabaseAndCreate(secret.SQL_DB_NAME);
+  await useDatabase(secret.SQL_DB_NAME);
+  await checkTableAndCreate(secret.SQL_DB_NAME, dbDetails.DB_USERS_TABLE, dbDetails.USERS_TABLE_SCHEMA);
+  await checkTableAndCreate(secret.SQL_DB_NAME, dbDetails.DB_TABLE_ONE, dbDetails.TABLE_ONE_SCHEMA);
+  await checkTableAndCreate(secret.SQL_DB_NAME, dbDetails.DB_TABLE_TWO, dbDetails.TABLE_TWO_SCHEMA);
+  await checkTableAndCreate(secret.SQL_DB_NAME, dbDetails.DB_TABLE_THREE, dbDetails.TABLE_THREE_SCHEMA);
 
   // INSERT TESTS:
   // passed this test, successfully added 'testUsr' and 'testPass' into the database.
@@ -177,9 +177,6 @@ async function setupDataBase(){
   // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_TABLE_ONE, dbDetails.USERS_INSERT_COULMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
   // console.log(await readFromDatabase(databaseConnection, dbDetails.DB_USERS_TABLE, dbDetails.TABLE_ONE_INSERT_COLUMNS, ['username', 'password'], ['testUsr', 'non-existing-password']));
 }
-
-
-setupDataBase();
 
 
 // create Insert and read function for my database --> DONE!

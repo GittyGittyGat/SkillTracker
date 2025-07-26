@@ -2,6 +2,7 @@ nodeJS/databaseLogs.log
 nodeJS/server.mjs
 nodeJS/logincreds.mjs
 nodeJS/details.mjs
+nodeJS/package.json
 Documents/What is SkillTracker.docx
 dep-components
 client-react-dep
@@ -16,3 +17,5 @@ client/jsconfig.json
 client/src/app/favicon.ico
 client/src/app/globals.css
 client/*
+noLongerInUse/
+nodeJS/*
